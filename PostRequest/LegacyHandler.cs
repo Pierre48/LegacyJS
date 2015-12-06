@@ -116,7 +116,7 @@ namespace LegacyJS
 
                     filter.AddChanges(rule.Changes);
 
-                    application.Response.Filter = filter;
+                    application.Response.Filter = filter; 
                 }
             }
             
