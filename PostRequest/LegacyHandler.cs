@@ -16,6 +16,18 @@ namespace LegacyJS
         {
             new Rule
             {
+                FilePathEndWith = new List<string> {"InsertedText.js" },
+                Changes = new List<Change>
+                {
+                    new Change
+                    {
+                        OldString = "Alert(\"The response is 42\");",
+                        NewString = "Alert(\"The response is 42(inserted text)\");",
+                    }
+                }
+            },
+            new Rule
+            {
                 FilePathEndWith = new List<string> {"WebResource.axd" },
                 Changes = new List<Change>
                 {

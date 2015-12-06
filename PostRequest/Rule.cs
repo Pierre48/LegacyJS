@@ -16,6 +16,11 @@ namespace LegacyJS
         public List<string> FilePathEndWith ;
 
         /// <summary>
+        /// The file path end with
+        /// </summary>
+        public List<string> UserAgents;
+
+        /// <summary>
         /// The changes/
         /// </summary>
         public List<Change> Changes ;
@@ -28,15 +33,22 @@ namespace LegacyJS
         /// <returns></returns>
         public bool Check(HttpRequest request, HttpResponse response)
         {
+            var result = true;
             if (FilePathEndWith != null)
             {
+                if (FilePathEndWith!=null)
                 foreach (var end in FilePathEndWith)
                 {
-                    if (request.FilePath.EndsWith(end, StringComparison.InvariantCultureIgnoreCase))
-                    return true;
+                    result &= end != null && request.FilePath.EndsWith(end, StringComparison.InvariantCultureIgnoreCase);
+                }
+
+                if (UserAgents != null)
+                    foreach (var userAgent in UserAgents)
+                {
+                    result &= userAgent != null && userAgent == request.UserAgent;
                 }
             }
-            return false;
+            return result;
         }
     }
 }
