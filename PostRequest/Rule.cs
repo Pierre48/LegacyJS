@@ -16,9 +16,9 @@ namespace LegacyJS
         public List<string> FilePathEndWith ;
 
         /// <summary>
-        /// The file path end with
+        /// ContentTypes
         /// </summary>
-        public List<string> UserAgents;
+        public List<string> ContentTypes;
 
         /// <summary>
         /// The changes/
@@ -33,22 +33,37 @@ namespace LegacyJS
         /// <returns></returns>
         public bool Check(HttpRequest request, HttpResponse response)
         {
-            var result = true;
+            var result = false;
             if (FilePathEndWith != null)
             {
-                if (FilePathEndWith!=null)
                 foreach (var end in FilePathEndWith)
                 {
-                    result &= end != null && request.FilePath.EndsWith(end, StringComparison.InvariantCultureIgnoreCase);
+                    result |= end != null && request.FilePath.EndsWith(end, StringComparison.InvariantCultureIgnoreCase);
                 }
-
-                if (UserAgents != null)
-                    foreach (var userAgent in UserAgents)
-                {
-                    result &= userAgent != null && userAgent == request.UserAgent;
-                }
+                if (!result) return result;
             }
-            return result;
+
+            if (ContentTypes != null)
+            {
+                foreach (var contentType in ContentTypes)
+                {
+                    result |= contentType != null && AcceptTypes(request.AcceptTypes, contentType);
+                }
+                if (!result) return result;
+            }
+
+            return true;
+        }
+
+        private bool AcceptTypes(string[] acceptTypes, string contentType)
+        {
+            if (acceptTypes == null) return false;
+
+            foreach (var acceptType in acceptTypes)
+            {
+                if (string.Equals(acceptType, contentType, StringComparison.CurrentCultureIgnoreCase)) return true;
+            }
+            return false;
         }
     }
 }

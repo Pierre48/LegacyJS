@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Handlers;
 
@@ -24,12 +25,11 @@ namespace LegacyJS
         /// </summary>
         /// <param name="filter">The filter.</param>
         /// <param name="encoding">The encoding.</param>
-        /// <param name="changes">changes to apply</param>
-        public FilterStream(Stream filter, Encoding encoding, List<Change> changes)
+        public FilterStream(Stream filter, Encoding encoding)
         {
             _encoding = encoding;
             _filter = filter;
-            _changes = changes;
+            _changes = new List<Change>();
         }
 
         #region Wrapped method (Processing is done by the original stream
@@ -137,13 +137,18 @@ namespace LegacyJS
             {
                 foreach (var change in _changes)
                 {
-                    str = str.Replace(change.OldString, change.NewString);
+                    str = Regex.Replace(str, change.OldString, change.NewString, RegexOptions.IgnoreCase);
                 }
             }
 
             var bytes = _encoding.GetBytes(str);
 
             _filter.Write(bytes, offset, bytes.Length);
+        }
+
+        internal void AddChanges(List<Change> changes)
+        {
+            _changes.AddRange(changes);
         }
     }
 }

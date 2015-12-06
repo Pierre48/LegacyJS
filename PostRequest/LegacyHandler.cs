@@ -16,13 +16,25 @@ namespace LegacyJS
         {
             new Rule
             {
-                FilePathEndWith = new List<string> {"InsertedText.js" },
+                ContentTypes = new List<string> {"application/javascript" },
                 Changes = new List<Change>
                 {
                     new Change
                     {
-                        OldString = "Alert(\"The response is 42\");",
-                        NewString = "Alert(\"The response is 42(inserted text)\");",
+                        OldString = "The response is 42",
+                        NewString = "The response is 42(That is a js request)",
+                    }
+                }
+            },
+            new Rule
+            {
+                FilePathEndWith = new List<string> {"sample.js" },
+                Changes = new List<Change>
+                {
+                    new Change
+                    {
+                        OldString = "The response is 42",
+                        NewString = "The response is 42(inserted text)",
                     }
                 }
             },
@@ -95,7 +107,16 @@ namespace LegacyJS
             {
                 if (rule.Check(Request, Response))
                 {
-                    application.Response.Filter = new FilterStream(Response.Filter, Response.ContentEncoding, rule.Changes);
+                    FilterStream filter = application.Response.Filter as FilterStream;
+                    if (filter == null)
+                    {
+                        filter = new FilterStream(Response.Filter, Response.ContentEncoding);
+                        application.Response.Filter = filter;
+                    }
+
+                    filter.AddChanges(rule.Changes);
+
+                    application.Response.Filter = filter;
                 }
             }
             
